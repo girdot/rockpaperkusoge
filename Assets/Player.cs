@@ -46,44 +46,23 @@ public class Character
         set { _hp = value; healthSlider.value = value; }
     }
 
-    public Character(
-            Player p_player,
-            Player p_opponent,
-            RectTransform characterUI)
+    public Character( Player p_player, Player p_opponent, RectTransform myUI)
     {
         _hp = maxHp;
         ConfigureThrows( p_player, p_opponent );
-        ConfigureUI( characterUI );
+        ConfigureUI( myUI );
     }
 
     private void ConfigureThrows(Player p_player, Player p_opponent)
     {
-        throws.Add(
-                new Throw(
-                    "Default Rock",
-                    Throw.ThrowType.Rock,
-                    p_player,
-                    p_opponent )
-                );
-        throws.Add(
-                new Throw(
-                    "Default Paper",
-                    Throw.ThrowType.Paper,
-                    p_player,
-                    p_opponent )
-                );
-        throws.Add(
-                new Throw(
-                    "Default Scissors",
-                    Throw.ThrowType.Scissors,
-                    p_player,
-                    p_opponent )
-                );
+        throws.Add( new Throw(Throw.ThrowType.Rock, p_player, p_opponent) );
+        throws.Add( new Throw(Throw.ThrowType.Paper, p_player, p_opponent) );
+        throws.Add( new Throw(Throw.ThrowType.Scissors, p_player, p_opponent) );
     }
 
-    private void ConfigureUI( RectTransform characterUI )
+    private void ConfigureUI( RectTransform myUI )
     {
-        healthSlider = characterUI.Find("Health Bar/Health Slider")
+        healthSlider = myUI.Find("Health Bar/Health Slider")
             .GetComponent<Slider>();
         healthSlider.maxValue = maxHp;
         healthSlider.value = maxHp;
@@ -93,4 +72,3 @@ public class Character
 
     public void Damage( int damage ) { hp = hp < damage ? 0 : hp - damage; }
 }
-
