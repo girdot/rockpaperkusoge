@@ -12,7 +12,6 @@ public class Throw
 
     private ThrowType throwType;
     public string name;
-    public bool is_disabled;
     public event EventHandler WonHandler;
     public event EventHandler LostHandler;
     public event EventHandler ClashedHandler;
@@ -23,21 +22,6 @@ public class Throw
         name = p_name;
         throwType = p_throwType;
         throwEffects.Add( new ThrowEffectDealDmgOnWin(this,  p_opponent, 1 ) );
-    }
-
-    protected virtual void OnWin(EventArgs e)
-    {
-        WonHandler?.Invoke( this, e );
-    }
-
-    protected virtual void OnLose(EventArgs e)
-    {
-        LostHandler?.Invoke( this, e );
-    }
-
-    protected virtual void OnClash(EventArgs e)
-    {
-        ClashedHandler?.Invoke( this, e );
     }
 
     public static void ResolveThrow( Throw a, Throw b )
@@ -103,9 +87,19 @@ public class Throw
         return true;
     }
 
-    private bool is_available()
+    protected virtual void OnWin(EventArgs e)
     {
-        return is_disabled ? false : true;
+        WonHandler?.Invoke( this, e );
+    }
+
+    protected virtual void OnLose(EventArgs e)
+    {
+        LostHandler?.Invoke( this, e );
+    }
+
+    protected virtual void OnClash(EventArgs e)
+    {
+        ClashedHandler?.Invoke( this, e );
     }
 }
 
@@ -114,6 +108,7 @@ public abstract class ThrowEffect
     public virtual void ExecuteOnWin(Object sender, EventArgs e){}
     public virtual void ExecuteOnLose(Object sender, EventArgs e){}
     public virtual void ExecuteOnClash(Object sender, EventArgs e){}
+
     public  ThrowEffect( Throw p_throw )
     {
         p_throw.WonHandler += ExecuteOnWin;
