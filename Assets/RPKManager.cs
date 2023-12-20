@@ -10,14 +10,6 @@ public class RPKManager : MonoBehaviour
 
     private int throwCounter = 1;
 
-    private enum ThrowOutcome
-    {
-        Clash,
-        P1Win,
-        P2Win
-    }
-
-    
     void Start()
     {
         player1.Reset( Player.CharacterChoice.Buster, player2 );
@@ -29,19 +21,7 @@ public class RPKManager : MonoBehaviour
     {
         if(player1.selectedThrow != null && player2.selectedThrow != null)
         {
-            ThrowOutcome outcome = getThrowOutcome( player1.selectedThrow, player2.selectedThrow);
-            switch(outcome) {
-                case ThrowOutcome.P1Win:
-                    foreach( ThrowEffect throwEffect in player1.selectedThrow.onWinEffects )
-                        throwEffect.execute();
-                    break;
-                case ThrowOutcome.P2Win:
-                    foreach( ThrowEffect throwEffect in player2.selectedThrow.onWinEffects )
-                        throwEffect.execute();
-                    break;
-                default:
-                    break;
-            }
+            Throw.ResolveThrow( player1.selectedThrow, player2.selectedThrow );
             player1.selectedThrow = null;
             player2.selectedThrow = null;
             throwCounter++;
@@ -57,16 +37,6 @@ public class RPKManager : MonoBehaviour
             }
             roundCounter.text = string.Format( "Throw #: {0}", throwCounter );
         }
-    }
-
-    private ThrowOutcome getThrowOutcome(Throw p1_throw, Throw p2_throw)
-    {
-        if(p1_throw == p2_throw)
-            return ThrowOutcome.Clash;
-        else if(p1_throw > p2_throw)
-            return ThrowOutcome.P1Win;
-        return ThrowOutcome.P2Win;
-
     }
 
     public void throwSelection(int throwNumber)

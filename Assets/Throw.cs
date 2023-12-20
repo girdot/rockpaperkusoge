@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 public class Throw
 {
@@ -11,28 +12,55 @@ public class Throw
 
     private ThrowType throwType;
     public string name;
-    public List<ThrowEffect> onWinEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onClashEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onLoseEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onThrowEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onParryEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onParryClashEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onParryLoseEffects = new List<ThrowEffect>();
-    public List<ThrowEffect> onParryWinEffects = new List<ThrowEffect>();
     public bool is_disabled;
+    public event EventHandler WonHandler;
+    public event EventHandler LostHandler;
+    public event EventHandler ClashedHandler;
+    public List<ThrowEffect> throwEffects = new List<ThrowEffect>();
 
-    public static bool operator !=(Throw a, Throw b)
+    public Throw(string p_name, ThrowType p_throwType, Player p_player, Player p_opponent)
     {
-        if ((b is null) != (a is null)) return true;
-        if (a is null && b is null) return false;
-        return a.throwType == b.throwType;
+        name = p_name;
+        throwType = p_throwType;
+        throwEffects.Add( new ThrowEffectDealDmgOnWin(this,  p_opponent, 1 ) );
     }
 
-    public static bool operator ==(Throw a, Throw b)
+    protected virtual void OnWin(EventArgs e)
     {
-        if ((b is null) != (a is null)) return false;
-        if (a is null && b is null) return true;
-        return a.throwType == b.throwType;
+        WonHandler?.Invoke( this, e );
+    }
+
+    protected virtual void OnLose(EventArgs e)
+    {
+        LostHandler?.Invoke( this, e );
+    }
+
+    protected virtual void OnClash(EventArgs e)
+    {
+        ClashedHandler?.Invoke( this, e );
+    }
+
+    public static void ResolveThrow( Throw a, Throw b )
+    {
+        if( a.Equals( b ) )
+        {
+            a.OnClash( EventArgs.Empty );
+            b.OnClash( EventArgs.Empty );
+        } else if( a > b )
+        {
+            a.OnWin( EventArgs.Empty );
+            b.OnLose( EventArgs.Empty );
+        } else
+        {
+            a.OnLose( EventArgs.Empty );
+            b.OnWin( EventArgs.Empty );
+        }
+    }
+
+    public override bool Equals( object obj ){
+        if( obj is Throw opponent_throw )
+            return throwType == opponent_throw.throwType;
+        return false;
     }
 
     public static bool operator >(Throw a, Throw b)
@@ -54,6 +82,7 @@ public class Throw
         }
         return false;
     }
+
     public static bool operator <(Throw a, Throw b)
     {
         switch( a.throwType )
@@ -73,12 +102,7 @@ public class Throw
         }
         return true;
     }
-    public Throw(string p_name, ThrowType p_throwType, Player p_player, Player p_opponent)
-    {
-        name = p_name;
-        throwType = p_throwType;
-        onWinEffects.Add( new ThrowEffectDamageOpponent( p_opponent, 1 ) );
-    }
+
     private bool is_available()
     {
         return is_disabled ? false : true;
@@ -87,21 +111,29 @@ public class Throw
 
 public abstract class ThrowEffect
 {
-    public abstract void execute();
+    public virtual void ExecuteOnWin(Object sender, EventArgs e){}
+    public virtual void ExecuteOnLose(Object sender, EventArgs e){}
+    public virtual void ExecuteOnClash(Object sender, EventArgs e){}
+    public  ThrowEffect( Throw p_throw )
+    {
+        p_throw.WonHandler += ExecuteOnWin;
+        p_throw.LostHandler += ExecuteOnLose;
+        p_throw.ClashedHandler += ExecuteOnLose;
+    }
 }
 
-public class ThrowEffectDamageOpponent : ThrowEffect
+public class ThrowEffectDealDmgOnWin : ThrowEffect
 {
     private int damage;
     private Player opponent;
 
-    public ThrowEffectDamageOpponent( Player p_opponent, int p_damage )
+    public ThrowEffectDealDmgOnWin( Throw p_throw, Player p_opponent, int p_damage ) : base(p_throw)
     {
         damage = p_damage;
         opponent = p_opponent;
     }
 
-    public override void execute(){
+    public override void ExecuteOnWin(Object sender, EventArgs e){
         opponent.character.Damage( damage );
     }
 }
