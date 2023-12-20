@@ -3,117 +3,82 @@ using System;
 
 public class Throw
 {
-    public enum ThrowType
+    public enum ThrowType { Rock, Paper, Scissors }
+    public enum ThrowOutcome { Won, Lost, Clashed }
+
+    public string name {get; private set;}
+    public event EventHandler<ThrowOutcome> handler;
+    public List<ThrowEffect> throwEffects = new List<ThrowEffect>();
+    private ThrowType throwType;
+
+    public Throw(ThrowType p_throwType, Player p_player, Player p_opponent)
     {
-        Rock,
-        Paper,
-        Scissors
+        name = "Default " + p_throwType.ToString();
+        throwType = p_throwType;
+        addThrowEffects( p_player, p_opponent );
     }
 
-    private ThrowType throwType;
-    public string name;
-    public event EventHandler WonHandler;
-    public event EventHandler LostHandler;
-    public event EventHandler ClashedHandler;
-    public List<ThrowEffect> throwEffects = new List<ThrowEffect>();
-
-    public Throw(string p_name, ThrowType p_throwType, Player p_player, Player p_opponent)
+    public virtual void addThrowEffects(Player p_player, Player p_opponent)
     {
-        name = p_name;
-        throwType = p_throwType;
-        throwEffects.Add( new ThrowEffectDealDmgOnWin(this,  p_opponent, 1 ) );
+        throwEffects.Add( new ThrowEffectDealDmgOnWin(handler, p_opponent, 1) );
     }
 
     public static void ResolveThrow( Throw a, Throw b )
     {
         if( a.Equals( b ) )
         {
-            a.OnClash( EventArgs.Empty );
-            b.OnClash( EventArgs.Empty );
+            a.handler?.Invoke( a, ThrowOutcome.Clashed );
+            b.handler?.Invoke( b, ThrowOutcome.Clashed );
         } else if( a > b )
         {
-            a.OnWin( EventArgs.Empty );
-            b.OnLose( EventArgs.Empty );
+            a.handler?.Invoke( a, ThrowOutcome.Won );
+            b.handler?.Invoke( b, ThrowOutcome.Lost );
         } else
         {
-            a.OnLose( EventArgs.Empty );
-            b.OnWin( EventArgs.Empty );
+            a.handler?.Invoke( a, ThrowOutcome.Lost );
+            b.handler?.Invoke( b, ThrowOutcome.Won );
         }
-    }
-
-    public override bool Equals( object obj ){
-        if( obj is Throw opponent_throw )
-            return throwType == opponent_throw.throwType;
-        return false;
     }
 
     public static bool operator >(Throw a, Throw b)
     {
-        switch( a.throwType )
-        {
-            case Throw.ThrowType.Rock:
-                if(b.throwType == Throw.ThrowType.Scissors)
-                    return true;
-                break;
-            case Throw.ThrowType.Paper:
-                if(b.throwType == Throw.ThrowType.Rock)
-                    return true;
-                break;
-            case Throw.ThrowType.Scissors:
-                if(b.throwType == Throw.ThrowType.Paper)
-                    return true;
-                break;
-        }
+        if (a.throwType == ThrowType.Rock && b.throwType == ThrowType.Scissors)
+            return true;
+        if (a.throwType == ThrowType.Paper && b.throwType == ThrowType.Rock)
+            return true;
+        if (a.throwType == ThrowType.Scissors && b.throwType == ThrowType.Paper)
+            return true;
         return false;
     }
 
     public static bool operator <(Throw a, Throw b)
     {
-        switch( a.throwType )
-        {
-            case Throw.ThrowType.Rock:
-                if(b.throwType == Throw.ThrowType.Scissors)
-                    return false;
-                break;
-            case Throw.ThrowType.Paper:
-                if(b.throwType == Throw.ThrowType.Rock)
-                    return false;
-                break;
-            case Throw.ThrowType.Scissors:
-                if(b.throwType == Throw.ThrowType.Paper)
-                    return false;
-                break;
-        }
-        return true;
+        return !(a > b) && !a.Equals(b);
     }
 
-    protected virtual void OnWin(EventArgs e)
+    public override bool Equals( object obj )
     {
-        WonHandler?.Invoke( this, e );
+        if( obj is Throw opponent_throw )
+            return throwType == opponent_throw.throwType;
+        return false;
     }
 
-    protected virtual void OnLose(EventArgs e)
-    {
-        LostHandler?.Invoke( this, e );
-    }
-
-    protected virtual void OnClash(EventArgs e)
-    {
-        ClashedHandler?.Invoke( this, e );
-    }
+    public override int GetHashCode() { return throwType.GetHashCode(); }
 }
 
 public abstract class ThrowEffect
 {
-    public virtual void ExecuteOnWin(Object sender, EventArgs e){}
-    public virtual void ExecuteOnLose(Object sender, EventArgs e){}
-    public virtual void ExecuteOnClash(Object sender, EventArgs e){}
+    public virtual void ExecuteOnWin(){}
+    public virtual void ExecuteOnLose(){}
+    public virtual void ExecuteOnClash(){}
 
-    public  ThrowEffect( Throw p_throw )
+    public ThrowEffect( EventHandler<Throw.ThrowOutcome> h ){ h += Execute; }
+
+    private void Execute(Object sender, Throw.ThrowOutcome outcome)
     {
-        p_throw.WonHandler += ExecuteOnWin;
-        p_throw.LostHandler += ExecuteOnLose;
-        p_throw.ClashedHandler += ExecuteOnLose;
+        if (outcome == Throw.ThrowOutcome.Won) ExecuteOnWin();
+        else if (outcome == Throw.ThrowOutcome.Lost) ExecuteOnLose();
+        else ExecuteOnClash();
     }
 }
 
@@ -122,13 +87,14 @@ public class ThrowEffectDealDmgOnWin : ThrowEffect
     private int damage;
     private Player opponent;
 
-    public ThrowEffectDealDmgOnWin( Throw p_throw, Player p_opponent, int p_damage ) : base(p_throw)
+    public ThrowEffectDealDmgOnWin(
+            EventHandler<Throw.ThrowOutcome> h,
+            Player p_opponent,
+            int p_damage ) : base(h)
     {
         damage = p_damage;
         opponent = p_opponent;
     }
 
-    public override void ExecuteOnWin(Object sender, EventArgs e){
-        opponent.character.Damage( damage );
-    }
+    public override void ExecuteOnWin(){ opponent.character.Damage( damage ); }
 }
