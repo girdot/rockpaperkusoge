@@ -76,3 +76,4 @@ crashlytics-build.properties
 connectwebgl.zip
 webgl_sharing
 /WebGL\ Builds/
+*.swp
