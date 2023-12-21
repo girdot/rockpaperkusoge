@@ -6,11 +6,13 @@ public enum ThrowOutcome { Won, Lost, Clashed }
 public abstract class Throw
 {
     public string name { get; private set; }
-    public List<ThrowEffect> throwEffects = new List<ThrowEffect>();
+    private List<ThrowEffect> throwEffects = new List<ThrowEffect>();
     protected ThrowType throwType;
     protected abstract string SetName();
     protected abstract ThrowType SetThrowType();
     protected abstract void addThrowEffects(Player p_player, Player p_opponent);
+    private delegate void ThrowOutcomeHandler(ThrowOutcome throwOutcome);
+    private ThrowOutcomeHandler throwOutcomeCallback;
 
     public Throw(Player p_player, Player p_opponent)
     {
@@ -19,28 +21,28 @@ public abstract class Throw
         addThrowEffects(p_player, p_opponent);
     }
 
+    public void AddThrowEffect(ThrowEffect throwEffect)
+    {
+        throwEffects.Add(throwEffect);
+        throwOutcomeCallback += throwEffect.Execute;
+    }
+
     public static void ResolveThrow(Throw a, Throw b)
     {
         if (a.Equals(b))
         {
-            foreach (ThrowEffect throwEffect in a.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Clashed);
-            foreach (ThrowEffect throwEffect in b.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Clashed);
+            a.throwOutcomeCallback(ThrowOutcome.Clashed);
+            b.throwOutcomeCallback(ThrowOutcome.Clashed);
         }
         else if (a > b)
         {
-            foreach (ThrowEffect throwEffect in a.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Won);
-            foreach (ThrowEffect throwEffect in b.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Lost);
+            a.throwOutcomeCallback(ThrowOutcome.Won);
+            b.throwOutcomeCallback(ThrowOutcome.Lost);
         }
         else
         {
-            foreach (ThrowEffect throwEffect in a.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Lost);
-            foreach (ThrowEffect throwEffect in b.throwEffects)
-                throwEffect.Execute(ThrowOutcome.Won);
+            a.throwOutcomeCallback(ThrowOutcome.Lost);
+            b.throwOutcomeCallback(ThrowOutcome.Won);
         }
     }
 
