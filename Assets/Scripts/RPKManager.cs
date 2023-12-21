@@ -12,8 +12,8 @@ public class RPKManager : MonoBehaviour
 
     void Start()
     {
-        player1.Reset( Player.CharacterChoice.Buster, player2 );
-        player2.Reset( Player.CharacterChoice.Buster, player1 );
+        player1.Reset( CharacterChoice.Buster, player2 );
+        player2.Reset( CharacterChoice.Buster, player1 );
         roundCounter.text = "Throw #: 1";
     }
 
@@ -27,13 +27,13 @@ public class RPKManager : MonoBehaviour
             throwCounter++;
             if(!player1.character.isAlive()){
                 throwCounter = 1;
-                player1.Reset( Player.CharacterChoice.Buster, player2, false );
-                player2.Reset( Player.CharacterChoice.Buster, player1, true );
+                player1.Reset( CharacterChoice.Buster, player2, false );
+                player2.Reset( CharacterChoice.Buster, player1, true );
             }
             if(!player2.character.isAlive()){
                 throwCounter = 1;
-                player1.Reset( Player.CharacterChoice.Buster, player1, true );
-                player2.Reset( Player.CharacterChoice.Buster, player2, false );
+                player1.Reset( CharacterChoice.Buster, player1, true );
+                player2.Reset( CharacterChoice.Buster, player2, false );
             }
             roundCounter.text = string.Format( "Throw #: {0}", throwCounter );
         }
