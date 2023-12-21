@@ -6,7 +6,7 @@ public enum CharacterChoice { Buster }
 
 public abstract class Character
 {
-    protected string name;
+    public abstract string name {get;}
     private Slider healthSlider;
     private readonly int maxHp = 6;
     private int _hp;

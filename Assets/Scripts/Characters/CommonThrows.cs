@@ -4,10 +4,10 @@
 // THROWS
 class Throw_DefaultRock : Throw
 {
+    public override string name { get { return "Default Rock"; } }
+    public override ThrowType throwType { get { return ThrowType.Rock; } }
     public Throw_DefaultRock(Player player, Player opponent)
         : base(player, opponent) { }
-    protected override string SetName() { return "Default Rock"; }
-    protected override ThrowType SetThrowType() { return ThrowType.Rock; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
         AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
@@ -16,10 +16,10 @@ class Throw_DefaultRock : Throw
 
 class Throw_DefaultPaper : Throw
 {
+    public override string name { get { return "Default Paper"; } }
+    public override ThrowType throwType { get { return ThrowType.Paper; } }
     public Throw_DefaultPaper(Player player, Player opponent)
         : base(player, opponent) { }
-    protected override string SetName() { return "Default Paper"; }
-    protected override ThrowType SetThrowType() { return ThrowType.Paper; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
         AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
@@ -28,10 +28,10 @@ class Throw_DefaultPaper : Throw
 
 class Throw_DefaultScissors : Throw
 {
+    public override string name { get { return "Default Scissors"; } }
+    public override ThrowType throwType { get { return ThrowType.Scissors; } }
     public Throw_DefaultScissors(Player player, Player opponent)
         : base(player, opponent) { }
-    protected override string SetName() { return "Default Scissors"; }
-    protected override ThrowType SetThrowType() { return ThrowType.Scissors; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
         AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
@@ -39,7 +39,6 @@ class Throw_DefaultScissors : Throw
 }
 
 // THROW EFFECTS
-
 public class TEffect_DmgOnWin : ThrowEffect
 {
     private int damage;

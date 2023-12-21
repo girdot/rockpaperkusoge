@@ -2,11 +2,9 @@ using UnityEngine;
 
 public class CharBuster : Character
 {
-    public CharBuster(Player p_player, Player p_opponent, RectTransform myUI) :
-        base(p_player, p_opponent, myUI)
-    {
-        name = "Buster";
-    }
+    public override string name { get { return "Buster"; } }
+    public CharBuster(Player p_player, Player p_opponent, RectTransform myUI)
+        : base(p_player, p_opponent, myUI) { }
 
     protected override void ConfigureThrows(Player p_player, Player p_opponent)
     {
