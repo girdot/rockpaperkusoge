@@ -5,19 +5,15 @@ public enum ThrowOutcome { Won, Lost, Clashed }
 
 public abstract class Throw
 {
-    public string name { get; private set; }
+    public abstract string name { get; }
+    public abstract ThrowType throwType { get; }
     private List<ThrowEffect> throwEffects = new List<ThrowEffect>();
-    protected ThrowType throwType;
-    protected abstract string SetName();
-    protected abstract ThrowType SetThrowType();
     protected abstract void addThrowEffects(Player p_player, Player p_opponent);
     private delegate void ThrowOutcomeHandler(ThrowOutcome throwOutcome);
     private ThrowOutcomeHandler throwOutcomeCallback;
 
     public Throw(Player p_player, Player p_opponent)
     {
-        name = SetName();
-        throwType = SetThrowType();
         addThrowEffects(p_player, p_opponent);
     }
 
