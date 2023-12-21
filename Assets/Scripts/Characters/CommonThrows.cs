@@ -10,7 +10,7 @@ class Throw_DefaultRock : Throw
     protected override ThrowType SetThrowType() { return ThrowType.Rock; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
-        throwEffects.Add(new TEffect_DmgOnWin(p_player, p_opponent, 1));
+        AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
     }
 }
 
@@ -22,7 +22,7 @@ class Throw_DefaultPaper : Throw
     protected override ThrowType SetThrowType() { return ThrowType.Paper; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
-        throwEffects.Add(new TEffect_DmgOnWin(p_player, p_opponent, 1));
+        AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
     }
 }
 
@@ -34,7 +34,7 @@ class Throw_DefaultScissors : Throw
     protected override ThrowType SetThrowType() { return ThrowType.Scissors; }
     protected override void addThrowEffects(Player p_player, Player p_opponent)
     {
-        throwEffects.Add(new TEffect_DmgOnWin(p_player, p_opponent, 1));
+        AddThrowEffect(new TEffect_DmgOnWin(p_player, p_opponent, 1));
     }
 }
 
