@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class CharBuster : Character {
+public class CharBuster : Character
+{
     public CharBuster(Player p_player, Player p_opponent, RectTransform myUI) :
         base(p_player, p_opponent, myUI)
     {

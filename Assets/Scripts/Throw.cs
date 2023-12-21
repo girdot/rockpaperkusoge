@@ -78,7 +78,8 @@ public abstract class ThrowEffect
     protected Player player;
     protected Player opponent;
 
-    public ThrowEffect( Player p_player, Player p_opponent){
+    public ThrowEffect(Player p_player, Player p_opponent)
+    {
         player = p_player;
         opponent = p_opponent;
     }

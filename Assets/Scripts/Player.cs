@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
         victoryCrown = characterUI.Find("Victory Crown").GetComponent<Image>();
     }
 
-    public void Reset( CharacterChoice p_char, Player opponent,
+    public void Reset(CharacterChoice p_char, Player opponent,
             bool isWinner = false)
     {
         switch (p_char)
