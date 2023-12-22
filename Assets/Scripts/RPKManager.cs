@@ -21,7 +21,7 @@ public class RPKManager : MonoBehaviour
     {
         if (player1.selectedThrow != null && player2.selectedThrow != null)
         {
-            Throw.ResolveThrow(player1.selectedThrow, player2.selectedThrow);
+            Throw.ResolveThrow(player1.selectedThrow, player1.isParrying, player2.selectedThrow, player2.isParrying);
             player1.selectedThrow = null;
             player2.selectedThrow = null;
             throwCounter++;
@@ -43,10 +43,33 @@ public class RPKManager : MonoBehaviour
 
     public void throwSelection(int throwNumber)
     {
-        if (throwNumber > 0)
-            player1.selectedThrow = player1.character.throws[throwNumber - 1];
-        else
-            player2.selectedThrow = player2.character.throws[Mathf.Abs(throwNumber) - 1];
+        switch (throwNumber)
+        {
+            case 1:
+                player1.selectedThrow = player1.character.GetThrowOptions().rock;
+                player1.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+            case 2:
+                player1.selectedThrow = player1.character.GetThrowOptions().paper;
+                player1.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+            case 3:
+                player1.selectedThrow = player1.character.GetThrowOptions().scissors;
+                player1.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+            case -1:
+                player2.selectedThrow = player2.character.GetThrowOptions().rock;
+                player2.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+            case -2:
+                player2.selectedThrow = player2.character.GetThrowOptions().paper;
+                player2.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+            case -3:
+                player2.selectedThrow = player2.character.GetThrowOptions().scissors;
+                player2.isParrying = Input.GetKey(KeyCode.LeftShift);
+                break;
+        }
     }
 }
 

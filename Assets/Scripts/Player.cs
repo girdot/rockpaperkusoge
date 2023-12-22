@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public Character character { get; private set; }
     [HideInInspector] public Throw selectedThrow;
+    [HideInInspector] public bool isParrying;
     private Image victoryCrown;
 
     void Start()
@@ -27,4 +28,3 @@ public class Player : MonoBehaviour
         victoryCrown.enabled = isWinner;
     }
 }
-
