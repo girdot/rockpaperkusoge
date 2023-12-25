@@ -1,25 +1,21 @@
 using UnityEngine;
 
-public class CharBuster : Character
+namespace RPKCharacters
 {
-    public override string name { get { return "Buster"; } }
-
-    // Define throws
-    private Throw_DefaultRock _defaultRock;
-    private Throw_DefaultPaper _defaultPaper;
-    private Throw_DefaultScissors _defaultScissors;
-
-    public CharBuster(Player p_player, Player p_opponent, RectTransform myUI)
-        : base(p_player, p_opponent, myUI)
+    public class RPKCharBuster : RPKChar
     {
-        // Initialize throws
-        _defaultRock = new Throw_DefaultRock(player, opponent);
-        _defaultPaper = new Throw_DefaultPaper(player, opponent);
-        _defaultScissors = new Throw_DefaultScissors(player, opponent);
-    }
+        public override string name { get { return "Buster"; } }
+        protected override int maxHp { get { return 6; } }
+        public RPKCharBuster(Player p_me, Player p_them, RectTransform myUI) :
+            base(p_me, p_them, myUI)
+        {
+            RegisterThrow(RPKThrow.DefaultRPKThrow(RPKChoice.Rock, p_me, p_them));
+            RegisterThrow(RPKThrow.DefaultRPKThrow(RPKChoice.Paper, p_me, p_them));
+            RegisterThrow(RPKThrow.DefaultRPKThrow(RPKChoice.Scissors, p_me, p_them));
 
-    // Retrieve throws
-    protected override Throw RockThrowOption() { return _defaultRock; }
-    protected override Throw PaperThrowOption() { return _defaultPaper; }
-    protected override Throw ScissorsThrowOption() { return _defaultScissors; }
+            throwSelection[RPKChoice.Rock] = throwLibrary["Default Rock"];
+            throwSelection[RPKChoice.Paper] = throwLibrary["Default Paper"];
+            throwSelection[RPKChoice.Scissors] = throwLibrary["Default Scissors"];
+        }
+    }
 }

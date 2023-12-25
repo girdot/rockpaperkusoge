@@ -1,134 +1,82 @@
-using System.Collections.Generic;
-
-public enum ThrowType { Rock, Paper, Scissors }
-public enum ThrowOutcome { Won, Lost, Clashed,
-    ParrySuccess,
-    ParryLost
-}
-
-public abstract class Throw
+public class RPKThrow
 {
-    public abstract string name { get; }
-    public abstract ThrowType throwType { get; }
-    private List<ThrowEffect> throwEffects = new List<ThrowEffect>();
-    protected abstract void addThrowEffects(Player p_player, Player p_opponent);
-    private delegate void ThrowOutcomeHandler(ThrowOutcome throwOutcome);
-    private ThrowOutcomeHandler throwOutcomeCallback;
-    private Player player;
-    private Player opponent;
+    public RPKChoice throwType { get; private set; }
+    public Player me;
+    public Player opponent;
+    public string name { get; private set; }
+    private int disabledTimer = 0;
 
-    public Throw(Player p_player, Player p_opponent)
+    public RPKThrow(string p_name, RPKChoice p_throwType, Player p_me, Player p_opponent)
     {
-        player = p_player;
+        name = p_name;
+        throwType = p_throwType;
+        me = p_me;
         opponent = p_opponent;
-        addThrowEffects(p_player, p_opponent);
+        OnParryLost = () => { me.character.Damage(1); };
+        OnParry = () => { opponent.character.Disable(opponent.throwSelection); };
+        RPKManager.ThrowFinished += PostThrowUpdate;
     }
 
-    public void AddThrowEffect(ThrowEffect throwEffect)
+    public static RPKThrow DefaultRPKThrow(RPKChoice p_throwType, Player p_me, Player p_opponent)
     {
-        throwEffects.Add(throwEffect);
-        throwOutcomeCallback += throwEffect.Execute;
+        string name = "Default " + p_throwType.ToString();
+        RPKThrow rpkThrow = new RPKThrow(name, p_throwType, p_me, p_opponent);
+        rpkThrow.OnWin += () => { p_opponent.character.Damage(1); };
+        return rpkThrow;
     }
 
-    public static void ResolveThrow(Throw a, bool a_parry, Throw b, bool b_parry)
+    public delegate void ThrowOutcomeHandler();
+    public ThrowOutcomeHandler OnWin = () => { };
+    public ThrowOutcomeHandler OnLose = () => { };
+    public ThrowOutcomeHandler OnClash = () => { };
+    public ThrowOutcomeHandler OnParryLost = () => { };
+    public ThrowOutcomeHandler OnParry = () => { };
+
+    public bool isDisabled() { return disabledTimer > 0 || me.character.isDisabled(throwType); }
+
+    private void PostThrowUpdate() { disabledTimer--; }
+
+    public static void ResolveThrow(Player a, Player b)
     {
-        if (a.Equals(b))
+        if (a.throwSelection == b.throwSelection)
         {
-            if(a_parry == b_parry)
+            if (a.isParrying == b.isParrying)
             {
-                a.throwOutcomeCallback(ThrowOutcome.Clashed);
-                b.throwOutcomeCallback(ThrowOutcome.Clashed);
+                a.GetSelectedThrow().OnClash();
+                b.GetSelectedThrow().OnClash();
             }
-            else if(a_parry && !b_parry)
+            else if (a.isParrying && !b.isParrying)
             {
-                a.throwOutcomeCallback(ThrowOutcome.ParrySuccess);
-                a.throwOutcomeCallback(ThrowOutcome.Clashed);
+                a.GetSelectedThrow().OnParry();
+                a.GetSelectedThrow().OnClash();
             }
-            else if(!a_parry && b_parry)
+            else if (!a.isParrying && b.isParrying)
             {
-                b.throwOutcomeCallback(ThrowOutcome.ParrySuccess);
-                b.throwOutcomeCallback(ThrowOutcome.Clashed);
+                b.GetSelectedThrow().OnParry();
+                b.GetSelectedThrow().OnClash();
             }
         }
-        else if (a > b)
+        else if (a.throwSelection > b.throwSelection)
         {
-            if( !a_parry )
+            if (!a.isParrying)
             {
-                a.throwOutcomeCallback(ThrowOutcome.Won);
-                if(b_parry)
-                    b.throwOutcomeCallback(ThrowOutcome.ParryLost);
+                a.GetSelectedThrow().OnWin();
+                if (b.isParrying)
+                    b.GetSelectedThrow().OnParryLost();
                 else
-                    b.throwOutcomeCallback(ThrowOutcome.Lost);
+                    b.GetSelectedThrow().OnLose();
             }
         }
         else
         {
-            if( !b_parry )
+            if (!b.isParrying)
             {
-                b.throwOutcomeCallback(ThrowOutcome.Won);
-                if(a_parry)
-                    a.throwOutcomeCallback(ThrowOutcome.ParryLost);
+                b.GetSelectedThrow().OnWin();
+                if (a.isParrying)
+                    a.GetSelectedThrow().OnParryLost();
                 else
-                    a.throwOutcomeCallback(ThrowOutcome.Lost);
+                    a.GetSelectedThrow().OnLose();
             }
         }
     }
-
-    public static bool operator >(Throw a, Throw b)
-    {
-        if (a.throwType == ThrowType.Rock && b.throwType == ThrowType.Scissors)
-            return true;
-        if (a.throwType == ThrowType.Paper && b.throwType == ThrowType.Rock)
-            return true;
-        if (a.throwType == ThrowType.Scissors && b.throwType == ThrowType.Paper)
-            return true;
-        return false;
-    }
-
-    public static bool operator <(Throw a, Throw b)
-    {
-        return !(a > b) && !a.Equals(b);
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj is Throw opponent_throw)
-            return throwType == opponent_throw.throwType;
-        return false;
-    }
-
-    public override int GetHashCode() { return throwType.GetHashCode(); }
 }
-
-public abstract class ThrowEffect
-{
-    protected virtual void OnWin() { }
-    protected virtual void OnLose() { }
-    protected virtual void OnClash() { }
-    protected virtual void OnParrySuccess()
-    {
-        opponent.character.DisableThrowType( opponent.selectedThrow.throwType, 1 );
-    }
-    protected virtual void OnParryLost()
-    {
-        player.character.Damage( 1 );
-    }
-    protected Player player;
-    protected Player opponent;
-
-    public ThrowEffect(Player p_player, Player p_opponent)
-    {
-        player = p_player;
-        opponent = p_opponent;
-    }
-
-    public void Execute(ThrowOutcome outcome)
-    {
-        if (outcome == ThrowOutcome.Won) OnWin();
-        else if (outcome == ThrowOutcome.Lost) OnLose();
-        else if (outcome == ThrowOutcome.ParrySuccess) OnParrySuccess();
-        else if (outcome == ThrowOutcome.ParryLost) OnParryLost();
-        else OnClash();
-    }
-}
-
