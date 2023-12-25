@@ -318,14 +318,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1199148491}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -3
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -693,9 +693,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1379701687}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1203,7 +1203,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterUI: {fileID: 251462806}
-  healthSlider: {fileID: 1055577258}
 --- !u!212 &1199148492
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1353,14 +1352,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1199148491}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -2
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1501,7 +1500,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterUI: {fileID: 33620102}
-  healthSlider: {fileID: 805576836}
 --- !u!1 &1423164217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1765,9 +1763,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1379701687}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2040,14 +2038,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1199148491}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -1
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -2172,9 +2170,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1423164218}
-        m_TargetAssemblyTypeName: RPKManager, Assembly-CSharp
-        m_MethodName: throwSelection
+      - m_Target: {fileID: 1379701687}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: selectThrow
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
