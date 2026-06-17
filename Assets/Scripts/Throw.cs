@@ -4,7 +4,6 @@ public class RPKThrow
     public Player me;
     public Player opponent;
     public string name { get; private set; }
-    private int disabledTimer = 0;
 
     public RPKThrow(string p_name, RPKChoice p_throwType, Player p_me, Player p_opponent)
     {
@@ -14,7 +13,6 @@ public class RPKThrow
         opponent = p_opponent;
         OnParryLost = () => { me.character.Damage(1); };
         OnParry = () => { opponent.character.Disable(opponent.throwSelection); };
-        RPKManager.ThrowFinished += PostThrowUpdate;
     }
 
     public static RPKThrow DefaultRPKThrow(RPKChoice p_throwType, Player p_me, Player p_opponent)
@@ -32,9 +30,7 @@ public class RPKThrow
     public ThrowOutcomeHandler OnParryLost = () => { };
     public ThrowOutcomeHandler OnParry = () => { };
 
-    public bool isDisabled() { return disabledTimer > 0 || me.character.isDisabled(throwType); }
-
-    private void PostThrowUpdate() { disabledTimer--; }
+    public bool isDisabled() { return me.character.isDisabled(throwType); }
 
     public static void ResolveThrow(Player a, Player b)
     {

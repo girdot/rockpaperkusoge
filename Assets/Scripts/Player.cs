@@ -10,14 +10,18 @@ public class Player : MonoBehaviour
     [HideInInspector] public RPKChar character { get; private set; }
     private Image victoryCrown;
 
-    void Start() { victoryCrown = characterUI.Find("Victory Crown").GetComponent<Image>(); }
-
-    public void Reset(RPKCharSelect p_char, Player opponent, bool isWinner = false)
+    void Start()
     {
+        victoryCrown = characterUI.Find("Victory Crown").GetComponent<Image>();
+        RPKManager.ThrowFinished += PostThrowUpdate;
+    }
+
+    public void Reset(string p_char, Player opponent, bool isWinner = false)
+    {
+        character?.Cleanup();
         character = RPKChar.SelectRPKChar(p_char, this, opponent, characterUI);
         victoryCrown.enabled = isWinner;
         throwSelection = null;
-        RPKManager.ThrowFinished += PostThrowUpdate;
     }
 
     public void selectThrow(int choice)

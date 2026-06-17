@@ -1,15 +1,12 @@
 using UnityEngine.UI;
 using UnityEngine;
+using System;
 using System.Collections.Generic;
-using RPKCharacters;
-
-public enum RPKCharSelect { Buster }
 
 public abstract class RPKChar
 {
     public abstract string name { get; }
     protected abstract int maxHp { get; }
-    protected Dictionary<string, RPKThrow> throwLibrary = new Dictionary<string, RPKThrow>();
     protected Dictionary<RPKChoice, RPKThrow> throwSelection = new Dictionary<RPKChoice, RPKThrow>
         { {RPKChoice.Rock, null},{RPKChoice.Paper, null},{RPKChoice.Scissors, null} };
     private Dictionary<RPKChoice, int> disabledTimers = new Dictionary<RPKChoice, int>()
@@ -17,6 +14,14 @@ public abstract class RPKChar
     private Slider _healthSlider;
     private int hp;
     protected RectTransform _myUI;
+
+    private static Dictionary<string, Func<Player, Player, RectTransform, RPKChar>> _registry
+        = new Dictionary<string, Func<Player, Player, RectTransform, RPKChar>>();
+
+    public static void Register(string charName, Func<Player, Player, RectTransform, RPKChar> factory)
+    {
+        _registry[charName] = factory;
+    }
 
     protected RPKChar(Player p_player, Player p_opponent, RectTransform myUI)
     {
@@ -26,18 +31,16 @@ public abstract class RPKChar
         RPKManager.ThrowFinished += PostThrowUpdate;
     }
 
-    public static RPKChar SelectRPKChar(
-            RPKCharSelect charChoice,
-            Player p_player,
-            Player p_opponent,
-            RectTransform myUI)
+    public static RPKChar SelectRPKChar(string charName, Player p_player, Player p_opponent, RectTransform myUI)
     {
-        switch (charChoice)
-        {
-            case RPKCharSelect.Buster:
-                return new RPKCharBuster(p_player, p_opponent, myUI);
-        }
+        if (_registry.TryGetValue(charName, out var factory))
+            return factory(p_player, p_opponent, myUI);
         return null;
+    }
+
+    public void Cleanup()
+    {
+        RPKManager.ThrowFinished -= PostThrowUpdate;
     }
 
     private void InitCharacterUI()
@@ -65,12 +68,12 @@ public abstract class RPKChar
                 !throwSelection[RPKChoice.Paper].isDisabled());
         _myUI.Find("Throw Select/Scissors Button").gameObject.SetActive(
                 !throwSelection[RPKChoice.Scissors].isDisabled());
+        UpdateCharacterSpecificUI();
     }
 
     protected virtual void InitCharacterSpecificUI() { }
     protected virtual void UpdateCharacterSpecificUI() { }
-    public void RegisterThrow(RPKThrow p_throw) { throwLibrary[p_throw.name] = p_throw; }
-    public RPKThrow GetThrow(string throwName) { return throwLibrary[throwName]; }
+    protected void SelectThrow(RPKThrow p_throw) { throwSelection[p_throw.throwType] = p_throw; }
     public RPKThrow selectThrow(RPKChoice choice) { return throwSelection[choice]; }
     public bool isAlive() { return hp > 0; }
     public void Damage(int damage) { hp = hp < damage ? 0 : hp - damage; }
